@@ -572,8 +572,15 @@ code {
   color: var(--white);
 }
 
-.platforms .button {
+.platforms .button,
+.platforms .pair {
   margin-top: auto;
+}
+
+.platforms .pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 /* legal pages */
