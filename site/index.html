@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hogyoku Vessel</title>
+<meta name="description" content="A free, open-source editor for Minecraft shaders. Code previews live as you type and builds into a resource pack for every version from 1.21 to 26.3.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<header class="bar over">
+  <a class="brand" href="./"><img src="img/icon.png" alt="" width="30" height="30">Hogyoku Vessel</a>
+  <nav>
+    <a href="#made">Examples</a>
+    <a href="#learn">Learn</a>
+    <a href="#download">Download</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel">GitHub</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="cinema">
+    <canvas aria-hidden="true"></canvas>
+    <div class="cinema-text">
+      <h1>Hogyoku Vessel</h1>
+      <p>Write Minecraft shaders and watch them run. One click builds a resource pack for every version from 1.21 to 26.3.</p>
+      <div class="actions">
+        <a class="button solid" href="#download">Download free</a>
+        <a class="button glass" href="https://github.com/Mirothe/Hogyoku-Vessel">View the source</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="made" id="made">
+    <ul class="mosaic" data-stagger>
+      <li class="big"><img src="img/big/event_horizon.jpg" alt="" width="960" height="600"><span><b>Event Horizon</b>Sky</span></li>
+      <li><img src="img/big/hogyoku_crystal.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Hogyoku</b>Object</span></li>
+      <li class="wide"><img src="img/big/moonlit_ocean.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Moonlit Ocean</b>Sky</span></li>
+      <li><img src="img/big/portal.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Portal</b>Surface</span></li>
+      <li class="wide"><img src="img/big/cosmic_rift.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Cosmic Rift</b>Sky</span></li>
+      <li class="wide"><img src="img/big/hyperspace.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Hyperspace</b>Sky</span></li>
+      <li><img src="img/big/lava_flow.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Lava Flow</b>Material</span></li>
+      <li><img src="img/big/gyroscope.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Gyroscope</b>Object</span></li>
+      <li class="wide"><img src="img/big/astral_sigil.jpg" alt="" width="960" height="600" loading="lazy"><span><b>Astral Sigil</b>Sky</span></li>
+    </ul>
+    <p class="caption" data-reveal>Every picture here is a shader made in Vessel. They all come with the app as examples you can open and pull apart.</p>
+  </section>
+
+  <section class="block" id="try">
+    <h2 data-reveal>Edit it right here</h2>
+    <p class="lede" data-reveal>This is a real Vessel effect running in your browser. Change a number and watch it change, or drag the picture to look around.</p>
+    <div class="studio" data-reveal>
+      <div class="tabs" role="tablist" aria-label="Example to edit">
+        <button role="tab" aria-selected="true" data-file="sunset" data-kind="sky">Sunset</button>
+        <button role="tab" aria-selected="false" data-file="tesseract" data-kind="object">Tesseract</button>
+        <button role="tab" aria-selected="false" data-file="mini_sun" data-kind="object">Mini sun</button>
+        <button role="tab" aria-selected="false" data-file="lava_lamp" data-kind="object">Lava lamp</button>
+      </div>
+      <div class="panes">
+        <div class="code">
+          <pre class="paint" aria-hidden="true"></pre>
+          <textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Shader code"></textarea>
+        </div>
+        <div class="view">
+          <canvas aria-label="Live preview, drag to look around"></canvas>
+        </div>
+      </div>
+      <p class="status" role="status">Compiling</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 data-reveal>One effect, every version</h2>
+    <p class="lede" data-reveal>Minecraft's core shaders changed shape five times between 1.21 and 26.3. Vessel keeps a template for each one, drops your code into all of them and checks every result with glslang, so a mistake shows up in the editor instead of as a broken game.</p>
+    <ol class="line">
+      <li><b>1.21</b><span>the original item shader</span></li>
+      <li><b>1.21.6</b><span>uniforms move into blocks</span></li>
+      <li><b>26.1</b><span>a new item shader replaces it</span></li>
+      <li><b>26.2</b><span>light and overlay color move in</span></li>
+      <li><b>26.3</b><span>new includes, checked as Vulkan too</span></li>
+    </ol>
+  </section>
+
+  <section class="block">
+    <h2 data-reveal>Five kinds of effect</h2>
+    <p class="lede" data-reveal>An effect is one file with one main function. The function you write decides what it becomes in game.</p>
+    <ul class="kinds" data-stagger>
+      <li><h3>Sky</h3><p>Surrounds the player, from sunsets to black holes.</p><code>vec3 sky(vec3 dir, float time)</code></li>
+      <li><h3>Object</h3><p>A 3D shape floating inside an item.</p><code>vec4 object(vec3 origin, vec3 dir, float time)</code></li>
+      <li><h3>Surface</h3><p>Paints the item's own faces: screens, portals, circles.</p><code>vec4 surface(vec2 uv, vec3 pos, vec3 normal, vec3 view, float time)</code></li>
+      <li><h3>Material</h3><p>Repaints every pixel of a normal item sprite.</p><code>vec4 material(vec4 texel, vec2 uv, vec3 normal, vec3 view, float time)</code></li>
+      <li><h3>Overlay</h3><p>Lays color over the player's view, like frost or rain.</p><code>vec4 overlay(vec2 screen, vec3 dir, float time)</code></li>
+    </ul>
+  </section>
+
+  <section class="block" id="learn">
+    <h2 data-reveal>Learn shaders inside the editor</h2>
+    <p class="lede" data-reveal>Fourteen lessons take you from your first line of GLSL to ray marched objects. Each one opens beside your code, ticks tasks off as you write them and ends with a challenge you solve on your own. New to code? Lesson one starts with a broken sky and shows you how to read the error.</p>
+    <ol class="lessons" data-stagger>
+      <li>GLSL basics</li>
+      <li>Your first sky</li>
+      <li>A sun</li>
+      <li>Noise clouds</li>
+      <li>Stars</li>
+      <li>Domain warping</li>
+      <li>Color like a pro</li>
+      <li>Your first object</li>
+      <li>Combining shapes</li>
+      <li>Lighting objects</li>
+      <li>Glow and see-through</li>
+      <li>Your first surface</li>
+      <li>Your first material</li>
+      <li>Your first overlay</li>
+    </ol>
+  </section>
+
+  <section class="block" id="download">
+    <h2 data-reveal>Download free</h2>
+    <p class="lede" data-reveal>Open source under the MIT license. Every download comes with its own Java, so there's nothing else to install. Needs a graphics card with OpenGL 3.3.</p>
+    <div class="platforms" data-stagger>
+      <div>
+        <h3>Windows</h3>
+        <p>Run the installer. It adds a Start menu shortcut and keeps the app up to date.</p>
+        <a class="button solid" href="https://github.com/Mirothe/Hogyoku-Vessel/releases/latest">Get the installer</a>
+      </div>
+      <div>
+        <h3>macOS</h3>
+        <p>Pick the Apple Silicon or Intel zip, unzip it and drag the app into Applications. It isn't signed by Apple yet, so the first time, right-click it and choose Open.</p>
+        <a class="button" href="https://github.com/Mirothe/Hogyoku-Vessel/releases/latest">Get the Mac app</a>
+      </div>
+      <div>
+        <h3>Linux</h3>
+        <p>Unpack the tar.gz and run <code>Hogyoku Vessel/bin/Hogyoku Vessel</code>. For the shader check, also install glslang.</p>
+        <a class="button" href="https://github.com/Mirothe/Hogyoku-Vessel/releases/latest">Get the Linux app</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>
+    <p>Made by Mirothe. Free and open source.</p>
+    <p>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</p>
+  </div>
+  <nav aria-label="About this site">
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/blob/main/LICENSE">License</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/blob/main/THIRD_PARTY.md">Credits</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/issues">Report a problem</a>
+  </nav>
+</footer>
+
+<script src="motion.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

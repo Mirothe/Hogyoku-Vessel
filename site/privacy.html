@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Hogyoku Vessel</title>
+<meta name="description" content="What Hogyoku Vessel and this website do with your data.">
+<link rel="icon" href="img/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="brand" href="./"><img src="img/icon.png" alt="" width="30" height="30">Hogyoku Vessel</a>
+  <nav>
+    <a href="./#download">Download</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel">GitHub</a>
+  </nav>
+</header>
+
+<main class="doc">
+  <h1 data-reveal>Privacy</h1>
+  <p class="updated" data-reveal>Last updated 8 November 2026</p>
+
+  <div class="short" data-reveal>
+    <p>Hogyoku Vessel has no accounts, no ads, no analytics and no tracking. Your shaders and projects stay on your computer. The app only goes online to check for updates and, if you leave Discord status on, to show your project in Discord.</p>
+  </div>
+
+  <h2>What the app stores</h2>
+  <p>Everything the app keeps is stored on your own computer:</p>
+  <ul>
+    <li>Your projects, in the folders you choose. Lessons go in <code>Documents/Hogyoku Vessel/Lessons</code>.</li>
+    <li>Your settings, like theme, recent projects and lesson progress, in your system's normal place for app settings.</li>
+    <li>Preview thumbnails of your effects, in a <code>.vessel</code> folder inside each project.</li>
+  </ul>
+  <p>Building a resource pack happens entirely on your computer. Nothing you write is uploaded.</p>
+
+  <h2>When the app goes online</h2>
+  <p><b>Update check.</b> When the app starts, it asks GitHub whether there's a newer version. GitHub sees your IP address and that the request came from Hogyoku Vessel. The Windows installer also downloads the app from GitHub. GitHub's handling of that is covered by the <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a>.</p>
+  <p><b>Discord status.</b> If Discord is running, the app tells it what you're working on: the project's name, the name of the file you have open, and the project's picture. Discord shows this on your profile to the people your Discord settings allow. This goes straight to the Discord app on your computer. Discord's use of it is covered by <a href="https://discord.com/privacy">Discord's Privacy Policy</a>.</p>
+  <p><b>Project picture upload.</b> Discord can only show pictures from a web link, so to show your project's picture the app uploads that picture to <a href="https://catbox.moe">catbox.moe</a>, a free public file host. Anyone with the link can see the picture, and it isn't deleted automatically. Only the project's picture is uploaded, never your code. The upload happens again only when you change the picture.</p>
+  <p>You can stop both Discord features at any time:</p>
+  <ul>
+    <li>Turn Discord status off in Settings, under Discord. Nothing is sent to Discord or uploaded after that.</li>
+    <li>Or keep it on and put your own link in the project's Discord image setting. The app then uses your link and uploads nothing.</li>
+  </ul>
+
+  <h2>This website</h2>
+  <p>This site sets no cookies and runs no analytics. The live editor runs entirely in your browser; the code you type in it never leaves your computer.</p>
+  <p>The site is hosted on GitHub Pages, which logs visitors' IP addresses for security, as described in the <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a>. Its fonts load from Google Fonts, so Google receives your IP address when the page loads, as described in the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+
+  <h2>Children</h2>
+  <p>Hogyoku Vessel doesn't collect personal information from anyone, including children. The Discord features depend on a Discord account, and Discord sets its own age requirements.</p>
+
+  <h2>Changes</h2>
+  <p>If this policy changes, the new version goes here with a new date, and the full history stays public in the project's GitHub repository.</p>
+
+  <h2>Questions</h2>
+  <p>Open an issue on <a href="https://github.com/Mirothe/Hogyoku-Vessel/issues">GitHub</a>.</p>
+</main>
+
+<footer>
+  <div>
+    <p>Made by Mirothe. Free and open source.</p>
+    <p>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</p>
+  </div>
+  <nav aria-label="About this site">
+    <a href="terms.html">Terms</a>
+    <a href="privacy.html" aria-current="page">Privacy</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/blob/main/LICENSE">License</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/blob/main/THIRD_PARTY.md">Credits</a>
+    <a href="https://github.com/Mirothe/Hogyoku-Vessel/issues">Report a problem</a>
+  </nav>
+</footer>
+
+<script src="motion.js"></script>
+</body>
+</html>

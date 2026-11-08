@@ -1,0 +1,19 @@
+# build output
+out/
+
+# packs built from a project, and the preview's thumbnails
+build/
+.vessel/
+
+# design drafts
+ui options/
+
+# editors and OS
+.idea/
+*.iml
+.vscode/
+Thumbs.db
+desktop.ini
+
+# your own projects, kept out of the repo
+example/
