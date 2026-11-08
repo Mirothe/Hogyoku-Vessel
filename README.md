@@ -36,7 +36,7 @@ Hogyoku Vessel runs on Windows, Linux and macOS (Intel and Apple Silicon) with J
 Every download on the [releases page](https://github.com/Mirothe/Hogyoku-Vessel/releases/latest) comes with its own Java.
 
 - **Windows**: run the installer. It adds a Start menu shortcut and keeps the app up to date.
-- **macOS**: unzip the Apple Silicon or Intel build and drag the app into Applications. It isn't signed by Apple yet, so the first time, right-click it and choose Open.
+- **macOS**: open the Apple Silicon or Intel disk image and drag the app onto the Applications folder. It isn't signed by Apple yet, so the first time, right-click it and choose Open.
 - **Linux**: unpack the tar.gz and run `Hogyoku Vessel/bin/Hogyoku Vessel`.
 - **Anything with Java 21**: `java -jar "Hogyoku Vessel.jar"`.
 
@@ -53,8 +53,6 @@ bash build.sh
 ```
 
 That makes `out/dist/Hogyoku Vessel.jar`, which runs on every platform, and the app with its own Java for the platform you built on. A Mac or Linux app can only be built on that system, so `.github/workflows/release.yml` builds all of them on GitHub: push a tag like `v1.1.0` and the Windows, Linux and both Mac builds land on that release. The version comes from `Forge.VERSION` unless you set `VERSION=` yourself.
-
-`bash test.sh` checks that every lesson's task checks stay unticked on the starter code, tick for their own examples, and accept the common ways of writing the same thing.
 
 The installer is a small C# program built with the .NET Framework compiler that ships with Windows:
 
@@ -75,7 +73,6 @@ bash installer/build.sh owner/repo
 | `Discord.java` | Discord status |
 | `resources/tiers`, `resources/stubs` | the Minecraft shader templates for each version |
 | `resources/examples` | example effects and their thumbnails |
-| `test/` | the lesson check test |
 | `site/` | the website, with a live shader editor that runs in the browser |
 
 ## License
