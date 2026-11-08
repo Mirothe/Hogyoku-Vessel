@@ -55,7 +55,10 @@ NAME=Hogyoku-Vessel-$VERSION-$OS
 # ditto and tar keep the launcher executable, a plain zip would lose that on Mac and Linux
 case "$OS" in
     windows) (cd out/app && python -c "import shutil; shutil.make_archive('../dist/$NAME', 'zip', '.', '$APP')"); FILE=$NAME.zip ;;
-    macos-*) ditto -c -k --keepParent "out/app/$APP" "out/dist/$NAME.zip"; FILE=$NAME.zip ;;
+    macos-*)
+        mkdir -p out/dmg && cp -R "out/app/$APP" out/dmg/ && ln -s /Applications out/dmg/Applications
+        hdiutil create -volname "Hogyoku Vessel" -srcfolder out/dmg -ov -format UDZO "out/dist/$NAME.dmg"
+        FILE=$NAME.dmg ;;
     *) tar -czf "out/dist/$NAME.tar.gz" -C out/app "$APP"; FILE=$NAME.tar.gz ;;
 esac
 echo "built out/dist/$FILE"
