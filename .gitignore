@@ -17,3 +17,6 @@ desktop.ini
 
 # your own projects, kept out of the repo
 example/
+
+# launch video work
+brag-output*/
