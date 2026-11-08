@@ -105,12 +105,38 @@ final class Learn {
                     <p>Numbers come in two kinds. <code>1</code> is a whole number (an int) and <code>1.0</code> is a decimal
                     (a float). Shaders almost always want floats, and GLSL won't quietly turn one into the other:
                     <code>float x = 1;</code> is an error, and <code>1 / 2</code> is 0 because it's whole number division.
-                    Write <code>1.0</code> and <code>0.5</code> and you'll never meet either problem.</p>
+                    Writing <code>1.0</code> and <code>0.5</code> avoids both problems.</p>
                     <p><code>vec2</code>, <code>vec3</code> and <code>vec4</code> hold 2, 3 or 4 floats. You can pick parts out of
                     them by name, <code>.x .y .z .w</code> or <code>.r .g .b .a</code>, and even reorder them:
                     <code>color.bgr</code> is the same color with red and blue swapped. That's called <b>swizzling</b>.</p>
                     <p>A <b>function</b> takes some values and gives one back. <code>sky</code> is a function, and you can write
                     your own above it to keep things tidy.</p>
+                    <h2>Reading an error</h2>
+                    <p>When the code breaks, the line under the preview names a line number and a short message. The message often points at the line after the real mistake: a missing <code>;</code> is only noticed when GLSL reaches the next line and
+                    can't make sense of the two together. So check the named line and the one above it.</p>
+                    <table>
+                    <tr><td><code>syntax error</code></td><td>a missing <code>;</code>, bracket or comma</td></tr>
+                    <tr><td><code>undeclared identifier</code></td><td>a name spelled differently from where it was made, or used before it's made</td></tr>
+                    <tr><td><code>cannot convert</code></td><td>mixing an int with a float, or a vec2 with a vec3</td></tr>
+                    <tr><td><code>no matching function</code></td><td>a function given the wrong number or types of values</td></tr>
+                    </table>
+                    <h2>The types you'll use</h2>
+                    <table>
+                    <tr><td><code>float</code></td><td>a decimal number, like <code>0.5</code></td></tr>
+                    <tr><td><code>int</code></td><td>a whole number, mostly for loop counters</td></tr>
+                    <tr><td><code>bool</code></td><td><code>true</code> or <code>false</code></td></tr>
+                    <tr><td><code>vec2 vec3 vec4</code></td><td>2, 3 or 4 floats: positions, directions and colors</td></tr>
+                    </table>
+                    <h2>Maths on whole vectors</h2>
+                    <p>Most maths works on every part of a vector at once. <code>vec3(1.0, 0.5, 0.2) * 2.0</code> doubles all three parts,
+                    and adding two vec3s adds them part by part. Functions like <code>sin</code>, <code>max</code> and <code>mix</code>
+                    work part by part too. Both sides have to be the same size: you can't add a vec2 to a vec3.</p>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Delete a <code>;</code> on purpose and read the message it gives.</li>
+                    <li>Return <code>dir</code> itself as the color. Every direction gets its own color, which is a quick way to see what a value looks like.</li>
+                    <li>Return <code>vec3(dir.y)</code> to see height as gray, black at the horizon and white overhead.</li>
+                    </ul>
                     """, """
                     // glsl basics
                     // this sky has a mistake in it on purpose, the error under the preview says which line.
@@ -139,9 +165,36 @@ final class Learn {
                     every pixel of the sky, every frame, and paints that pixel whatever color you give back.</p>
                     <p>The only thing that changes from pixel to pixel is <code>dir</code>, the direction that pixel looks in.
                     It's a vector of length 1, so <code>dir.y</code> is 1 when you look straight up, 0 at the horizon and -1
-                    straight down. That one number is enough for a whole sky.</p>
+                    straight down. <code>dir.y</code> alone is enough for a simple sky.</p>
                     <p>Colors are <code>vec3(red, green, blue)</code> with each part from 0 to 1. <code>mix(a, b, t)</code> blends
                     two of them: all <code>a</code> when t is 0, all <code>b</code> when t is 1.</p>
+                    <h2>Why one number is enough</h2>
+                    <p>The sky is the inside of a huge ball around you. Every pixel is one point on that ball, and
+                    <code>dir</code> is the arrow from you to that point. Because the arrow always has length 1, its <code>y</code> part
+                    says exactly how high up the point is, no matter which way you face.</p>
+                    <h2>What mix really does</h2>
+                    <p><code>mix(a, b, t)</code> is <code>a * (1.0 - t) + b * t</code>. At t = 0.5 you get the color halfway between. If t
+                    goes outside 0 to 1, mix keeps going past the colors you gave it, which is where the odd colors under the horizon
+                    come from. <code>max</code> or <code>clamp</code> keeps t in range.</p>
+                    <h2>Shaping the gradient</h2>
+                    <p>A straight fade looks flat. Bend it before mixing:</p>
+                    <table>
+                    <tr><td><code>pow(up, 0.5)</code></td><td>the top color reaches down further</td></tr>
+                    <tr><td><code>pow(up, 2.0)</code></td><td>the horizon color climbs higher</td></tr>
+                    <tr><td><code>smoothstep(0.0, 0.3, up)</code></td><td>a quick band at the horizon, then even color above</td></tr>
+                    </table>
+                    <p>Try each one on the lesson's gradient and compare.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Colors above 1.0 all show as the same white, so a bright mix loses its detail.</li>
+                    <li><code>float up = 1;</code> is an error, write <code>1.0</code>.</li>
+                    <li>Without its own ground color, everything below the horizon is just the horizon color again.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Use two mixes for three colors: one from the horizon to the middle, one from the middle to the top.</li>
+                    <li>Make a night sky with a faint glow along the horizon.</li>
+                    </ul>
                     """, """
                     // your first sky
                     // sky() runs once for every pixel of the sky. dir is the direction that pixel looks in,
@@ -171,6 +224,30 @@ final class Learn {
                     a bit under 1 to a big power crushes it toward 0, and only the pixels almost exactly on the sun survive.
                     A big power gives a small disc and a small power gives a wide glow.</p>
                     <p>Light adds up, so suns, glows and halos are usually added on top of the sky with <code>+=</code>.</p>
+                    <h2>Directions must have length 1</h2>
+                    <p><code>dot</code> only means "how much two directions agree" when both have length 1, so the sun's direction goes through <code>normalize</code> first. In the preview, <code>-z</code> is straight ahead and <code>y</code> is up, so
+                    <code>vec3(0.0, 0.3, -1.0)</code> is ahead and a little above the horizon.</p>
+                    <h2>How big is the sun?</h2>
+                    <p>The power decides the size. <code>pow(sun, 500.0)</code> is still half bright about 3 degrees from the center, which
+                    reads as a big soft sun. The real sun is half a degree across, which would be a power near 20000. For a disc with a
+                    hard edge instead of a soft one, use <code>smoothstep(0.9995, 0.9998, sun)</code>.</p>
+                    <h2>Light stacks up</h2>
+                    <p>A convincing sun is several layers added together: a small bright disc, a halo around it and a wide warm glow. Each
+                    layer is dimmer and wider than the last. Adding them can push colors past 1.0, which lesson 7 fixes with tone
+                    mapping.</p>
+                    <h2>A sky that reacts</h2>
+                    <p><code>sunDir.y</code> says how high the sun is, so the rest of the sky can follow it, getting darker and warmer as the sun goes down, with stars once it's gone. Mixing the sky color toward orange by how low the sun is makes a simple sunset in one line.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Behind you, <code>dot</code> is negative, and <code>pow</code> of a negative number is undefined, which shows up as
+                    black or flickering pixels. Keeping it above zero with <code>max</code> prevents that.</li>
+                    <li>Forgetting <code>normalize</code> makes the sun the wrong size, or missing completely.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Swap the soft disc for a hard edged one with smoothstep.</li>
+                    <li>Tint the sun itself red when it's close to the horizon.</li>
+                    </ul>
                     """, """
                     // a sun
                     // dot(a, b) of two directions is 1 when they point the same way and gets smaller as they turn apart.
@@ -197,13 +274,39 @@ final class Learn {
 
             new Lesson("lesson_clouds", "Noise clouds", "noise, octaves and a cloud ceiling", 12, """
                     <p>Random numbers per pixel only give you static. <b>Value noise</b> picks random numbers at the corners of a
-                    grid and blends smoothly between them, so neighbouring pixels get similar values. That smoothness is what
-                    makes it useful.</p>
+                    grid and blends smoothly between them, so neighbouring pixels get similar values.</p>
                     <p>One layer of noise looks like blurry blobs. Add a second layer at twice the detail and half the
-                    strength, then a third, and so on. That stack is called <b>fbm</b> and it's how nearly every cloud, smoke
-                    and gas effect is made. Each layer is one <b>octave</b>.</p>
+                    strength, then a third, and so on. That stack is called <b>fbm</b>, and it's the usual starting point for clouds and smoke. Each layer is one <b>octave</b>.</p>
                     <p>Real clouds sit on a ceiling above you, so near the horizon you see a lot of them squashed together.
                     Dividing <code>dir.xz</code> by <code>dir.y</code> gives you exactly that: positions on a flat ceiling.</p>
+                    <h2>Inside the noise</h2>
+                    <p><code>hash</code> turns a position into a number that looks random: a sine wave squeezed so hard that its digits
+                    jump around. <code>noise</code> asks hash for a value at the eight corners of the grid cube around the point, then
+                    blends them with the curve <code>f * f * (3.0 - 2.0 * f)</code>, which eases in and out so there are no creases along
+                    the grid lines.</p>
+                    <h2>Scale and octaves</h2>
+                    <p>Multiplying the position zooms the noise: <code>noise(p * 8.0)</code> has smaller blobs than
+                    <code>noise(p * 2.0)</code>. Each octave doubles the scale and halves the strength, so big shapes stay big and the
+                    small ones only add detail. Five octaves add up to almost 1.0. More octaves mean more detail but cost more, and four
+                    to six is plenty for a sky.</p>
+                    <h2>Why the ceiling trick works</h2>
+                    <p>Near the horizon <code>dir.y</code> is tiny, so <code>dir.xz / dir.y</code> becomes huge. Clouds far away get
+                    squashed together like a real cloud layer seen from the ground. Right at the horizon they squash so much that they
+                    flicker, which is why the lesson fades them out there. <code>max(dir.y, 0.05)</code> stops a division by zero.</p>
+                    <h2>Coverage and softness</h2>
+                    <p>In <code>smoothstep(a, b, n)</code>, raising <code>a</code> means fewer clouds, and moving <code>a</code> and
+                    <code>b</code> closer gives harder edges. For a lit look, look the noise up a second time a little toward the sun:
+                    where the second value is lower, the cloud's edge faces the light.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>No horizon fade leaves a shimmering line where the clouds meet the ground.</li>
+                    <li>Adding time inside the loop makes every octave drift at a different speed. Sometimes that looks good, but it's easy to do by accident.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Two cloud layers at different heights drifting at different speeds.</li>
+                    <li>Gray, heavy storm clouds with almost no sky between them.</li>
+                    </ul>
                     """, """
                     // noise clouds
                     // noise() gives smooth random values between 0 and 1. adding a few layers of it, each one twice as
@@ -249,6 +352,34 @@ final class Learn {
                     <p>Run the id through a <b>hash</b>, a function that turns any input into a random looking number between
                     0 and 1, and only light the cells whose number lands above 0.97. About 3 cells in 100 get a star.</p>
                     <p>The same hash is handy for anything that should differ star by star: brightness, color, twinkle speed.</p>
+                    <h2>Why cells?</h2>
+                    <p>Every pixel runs on its own and can't see the others. Checking a list of a thousand stars for every pixel would be
+                    far too slow. Cells solve it: each pixel works out which cell it's in, asks that one cell whether it has a star, and
+                    is done.</p>
+                    <h2>Size and density</h2>
+                    <p>The number in <code>floor(dir * 80.0)</code> sets how big the cells are. A bigger number means smaller cells, so
+                    smaller and more numerous stars. The threshold sets how many cells get a star: 0.97 lights about 3 in 100, 0.99
+                    about 1 in 100.</p>
+                    <h2>Hiding the grid</h2>
+                    <p>A star always sitting in the middle of its cell lines up in rows you can spot. Move it to a random spot inside the
+                    cell with three more hashes:</p>
+                    <pre>vec3 jitter = vec3(hash(cell + 1.0),
+                        hash(cell + 2.0), hash(cell + 3.0)) - 0.5;</pre>
+                    <p>Then measure the distance from the cell's middle plus <code>jitter * 0.6</code> instead of from the middle
+                    itself.</p>
+                    <h2>One hash per property</h2>
+                    <p>Use a different offset for each thing a star needs: whether it exists, how bright it is, its color, how fast it
+                    twinkles. Reusing the same hash links them, so for example only the brightest cells would ever get stars.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Stars that look like a grid: add jitter.</li>
+                    <li>Stars that blink together: each one needs its own phase from the hash.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>A milky way: multiply the chance of a star by a band, like <code>exp(-abs(dir.z) * 4.0)</code>.</li>
+                    <li>Hide the stars wherever a sun from lesson 3 would be up.</li>
+                    </ul>
                     """, """
                     // stars
                     // floor() cuts space into numbered cells and fract() tells you where you are inside one.
@@ -276,11 +407,42 @@ final class Learn {
                             "vec3 fine = floor(dir * 200.0);\nfloat faint = step(0.98, hash(fine)) * (1.0 - smoothstep(0.0, 0.5, length(fract(dir * 200.0) - 0.5)));\nreturn night + tint * star + vec3(faint * 0.5);", count("floor\\s*\\(", 2)))),
 
             new Lesson("lesson_warp", "Domain warping", "noise that bends itself", 12, """
-                    <p>fbm on its own looks like fog. To get swirls, tendrils and gas that looks like it's flowing, you
+                    <p>fbm on its own looks like fog. To get swirls and gas that looks like it's flowing, you
                     <b>warp</b> the position before you look up the noise. You compute a few fbm values first, use them as an
                     offset, and feed the shifted position into fbm again.</p>
                     <p>Because the offset itself is smooth noise, the result stays smooth but gets twisted into shapes that
                     plain noise never makes. Animate the offset and the shapes start to churn.</p>
+                    <h2>What the offset does</h2>
+                    <p>Warping moves the point before the noise is looked up, so the pattern gets dragged along with it. How far it moves
+                    decides the look:</p>
+                    <table>
+                    <tr><td><code>warp * 0.3</code></td><td>a gentle wobble, like heat haze</td></tr>
+                    <tr><td><code>warp * 1.5</code></td><td>proper swirls and folds</td></tr>
+                    <tr><td><code>warp * 4.0</code></td><td>chaotic, almost marbled</td></tr>
+                    </table>
+                    <h2>Three different offsets</h2>
+                    <p>Each axis of the warp gets its own fbm with its own shift, like <code>p + vec3(5.2, 1.3, 2.8)</code>. If all three
+                    used the same position they'd always be equal, and the pattern would just slide along one diagonal.</p>
+                    <h2>Going two levels deep</h2>
+                    <p>You can warp the warp: build a first offset, use it to build a second, and feed the second into the final lookup.
+                    Each level adds another layer of folding, and two levels is usually enough for a smoky, folded look.</p>
+                    <h2>Color from the warp</h2>
+                    <p><code>length(warp)</code> is large where the space was pushed hardest, and mixing
+                    colors by it lights up the edges of the swirls, which reads as veins or filaments.</p>
+                    <h2>Cost</h2>
+                    <p>Every fbm is five noise calls, and every noise call is eight hashes. Three fbms for the warp plus the final one is
+                    160 hashes per pixel. That's fine for a sky, but it adds up fast if you go two levels deep, so give the warp fewer
+                    octaves than the final lookup.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Animating everything turns it to mush. Move only the warp and let the final pattern follow.</li>
+                    <li>A huge strength makes the pattern noisy rather than swirly.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Marble: warp a pattern of stripes, <code>sin(p.x * 10.0)</code>, instead of fbm.</li>
+                    <li>Color by <code>length(warp)</code> and see the veins appear.</li>
+                    </ul>
                     """, """
                     // domain warping
                     // fbm here is the same octave loop from the clouds lesson, already written for you
@@ -335,6 +497,37 @@ final class Learn {
                     <p>When you add a lot of light, colors go past 1 and clip to flat white. <b>Tone mapping</b> squeezes them
                     back. <code>1.0 - exp(-color)</code> leaves dark values almost alone and bends bright ones smoothly toward
                     1, so highlights keep their shape.</p>
+                    <h2>Reading the four vectors</h2>
+                    <table>
+                    <tr><td><code>a</code></td><td>the middle brightness of each channel</td></tr>
+                    <tr><td><code>b</code></td><td>how far each channel swings, the contrast</td></tr>
+                    <tr><td><code>c</code></td><td>how many times it cycles as t goes from 0 to 1</td></tr>
+                    <tr><td><code>d</code></td><td>where each channel starts its cycle, which sets the hues</td></tr>
+                    </table>
+                    <h2>Sets to start from</h2>
+                    <table>
+                    <tr><td>rainbow</td><td><code>d = vec3(0.0, 0.33, 0.67)</code></td></tr>
+                    <tr><td>fire</td><td><code>a = vec3(0.5), b = vec3(0.5), c = vec3(1.0, 0.7, 0.4), d = vec3(0.0, 0.15, 0.2)</code></td></tr>
+                    <tr><td>ice</td><td><code>d = vec3(0.5, 0.6, 0.7)</code> with <code>b = vec3(0.3)</code></td></tr>
+                    </table>
+                    <p>Change one vector at a time to see what each one does.</p>
+                    <h2>Why tone mapping</h2>
+                    <p>A screen can only show 0 to 1, but light in the real world just adds up. When you stack suns, glows and stars,
+                    values pass 1.0 and every bright part becomes the same flat white. <code>1.0 - exp(-color * k)</code> bends the top
+                    end so bright values approach 1 without reaching it. The <code>k</code> works like exposure: bigger is brighter.</p>
+                    <h2>Brighter blends</h2>
+                    <p>Mixing two colors straight gives a slightly dark middle. Mixing their squares and taking the square root,
+                    <code>sqrt(mix(a * a, b * b, t))</code>, keeps the middle bright, which helps sunsets and gradients.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Adding more light after tone mapping brings the clipping back. Tone map last.</li>
+                    <li>A big <code>c</code> makes the colors cycle so fast they look like stripes.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Color the clouds from lesson 4 with a palette.</li>
+                    <li>Try exposures of 0.5, 1.5 and 4.0 and compare.</li>
+                    </ul>
                     """, """
                     // color like a pro
                     // this sky is way too bright on purpose, half of it clips straight to white
@@ -363,6 +556,40 @@ final class Learn {
                     by exactly that distance, because nothing can be closer. Near the surface the steps get tiny, and when
                     they're small enough you've hit it. This is called <b>raymarching</b>.</p>
                     <p>Return alpha 1 for solid, 0 for empty space so the world shows through, or anything between for glass and glow.</p>
+                    <h2>What a distance function returns</h2>
+                    <p>A distance function gives a positive number outside the shape, zero on its surface and a negative number inside.
+                    As long as it never says a surface is further away than it really is, stepping forward by that amount can't skip past anything. Raymarching depends on that rule.</p>
+                    <h2>The loop, line by line</h2>
+                    <ul>
+                    <li><code>t</code> is how far along the ray you've walked.</li>
+                    <li><code>p = origin + dir * t</code> is where that puts you.</li>
+                    <li><code>d</code> is how far the closest surface is from there.</li>
+                    <li>If d is tiny you've hit it. If not, walk d further and try again.</li>
+                    <li>Once t passes 3.5 you've left the box, so the ray missed.</li>
+                    </ul>
+                    <h2>Moving, turning and scaling</h2>
+                    <p>To move a shape, you move the space it's measured in instead. To put a sphere to the right, measure from a point
+                    to the right: <code>length(p - vec3(0.3, 0.0, 0.0)) - 0.2</code>. To turn it, turn <code>p</code> the other way. To
+                    scale it, divide p and multiply the result: <code>shape(p / s) * s</code>.</p>
+                    <h2>Shapes to know</h2>
+                    <table>
+                    <tr><td>sphere</td><td><code>length(p) - r</code></td></tr>
+                    <tr><td>box</td><td><code>length(max(abs(p) - size, 0.0))</code></td></tr>
+                    <tr><td>torus</td><td><code>length(vec2(length(p.xz) - R, p.y)) - r</code></td></tr>
+                    <tr><td>capsule</td><td>distance to a line segment, minus the radius</td></tr>
+                    </table>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Too few steps leaves holes around the edges where rays brush past.</li>
+                    <li>A hit threshold that's too big makes shapes look swollen and blobby.</li>
+                    <li>A shape bigger than the box gets cut off flat at its walls.</li>
+                    <li>Returning a color with alpha 1 when the ray misses draws a black box around everything.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Move the sphere round in a circle with <code>cos(time)</code> and <code>sin(time)</code>.</li>
+                    <li>Try the torus formula from the table.</li>
+                    </ul>
                     """, """
                     // your first object
                     // the box goes from -1 to 1 on every axis and origin is where the ray enters it.
@@ -402,6 +629,37 @@ final class Learn {
                     <p>A plain min leaves a hard crease where shapes meet. A <b>smooth min</b> blends the two distances over a
                     small range, so the shapes melt into each other like clay.</p>
                     <p>Keeping the shape in its own function means the normal and the march both use the same thing.</p>
+                    <h2>The three ways to combine</h2>
+                    <table>
+                    <tr><td><code>min(a, b)</code></td><td>both shapes together</td></tr>
+                    <tr><td><code>max(a, b)</code></td><td>only where they overlap</td></tr>
+                    <tr><td><code>max(a, -b)</code></td><td>a with b carved out of it</td></tr>
+                    </table>
+                    <h2>Smooth min, explained</h2>
+                    <p><code>k</code> is how wide the blend is, measured in the same units as the shapes. 0.05 rounds the joint like a
+                    fillet, 0.3 melts the shapes into one blob. There's a smooth version of carving too: <code>-smin(-a, b, k)</code>
+                    cuts with a soft, rounded edge.</p>
+                    <h2>Repeating a shape</h2>
+                    <p>Folding space repeats whatever you measure in it. <code>q = mod(p + 0.5 * c, c) - 0.5 * c</code> makes copies every
+                    <code>c</code> units along each axis, all for the price of one shape. Keep the result inside the box with a
+                    <code>max</code> against a big box, or the copies fill everything.</p>
+                    <h2>Twisting and bending</h2>
+                    <p>Turning <code>p.xz</code> by an angle that depends on <code>p.y</code> twists the shape like a towel. Deformations
+                    like this break the "never too far" rule a little, so step by <code>d * 0.7</code> instead of the full d, or you'll
+                    see holes.</p>
+                    <h2>Keeping it readable</h2>
+                    <p>Give each part its own named distance (<code>ball</code>, <code>ring</code>, <code>stem</code>) and combine them
+                    at the end. When something looks wrong, you can return a single part to see it on its own.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Carving with the wrong sign removes everything outside the cutter instead of inside it.</li>
+                    <li>Heavy twisting with full steps leaves holes and missing chunks.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>A twisted box.</li>
+                    <li>A row of rings using repetition along one axis only.</li>
+                    </ul>
                     """, """
                     // combining shapes
                     // shape() is the distance to the surface. everything you build goes in here
@@ -448,8 +706,37 @@ final class Learn {
                     surface faces the light. <b>Specular</b> is the shiny highlight, found by reflecting the view ray and seeing
                     how close it bounces toward the light. A <b>rim</b> or fresnel term brightens edges that face away from
                     you, which makes things pop off the background.</p>
-                    <p>A free bonus: the number of steps the march took is a decent stand in for <b>ambient occlusion</b>,
+                    <p>The number of steps the march took is a decent stand in for <b>ambient occlusion</b>,
                     because rays that brush past creases take more steps.</p>
+                    <h2>How the normal is found</h2>
+                    <p>Move the point a tiny bit along x and measure the distance on both sides. The difference says how fast the
+                    distance grows in that direction. Do it for y and z too and you have the direction the distance grows fastest, which
+                    points straight out of the surface. The nudge <code>e</code> matters: too small and the normal gets noisy, too big
+                    and sharp edges go soft.</p>
+                    <h2>Diffuse</h2>
+                    <p>A surface turned away from the light catches less of it, because the same light spreads over more area.
+                    <code>dot(n, light)</code> is exactly that falloff: 1 facing the light, 0 side on.</p>
+                    <h2>Specular</h2>
+                    <p>Bounce the view ray off the surface with <code>reflect(dir, n)</code> and see how close it lands to the light. The
+                    power is the shininess: 8 looks like rough plastic, 64 like polished metal. A common alternative uses the
+                    <b>half vector</b>, <code>normalize(light - dir)</code>, against the normal.</p>
+                    <h2>Fresnel</h2>
+                    <p>Almost everything reflects more at grazing angles. Glass looks clear face on and like a mirror side on. A good
+                    approximation is <code>f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0)</code>, with f0 around 0.04 for most materials.</p>
+                    <h2>Shadows</h2>
+                    <p>From the point you hit, march a second ray toward the light. If it hits something, the point is in shadow. For
+                    soft shadows, keep the smallest <code>k * d / t</code> seen along the way and use it as the amount of light.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>A shadow ray that starts exactly on the surface hits that surface straight away and shadows everything. Start a
+                    little outside it: <code>p + n * 0.01</code>.</li>
+                    <li>Forgetting ambient light makes the dark side pure black.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Add a hard shadow on the ring from the ball.</li>
+                    <li>A second, blue light from the other side.</li>
+                    </ul>
                     """, """
                     // lighting objects
                     // the shape and its normal are done, right now it's lit flat. light it properly
@@ -499,6 +786,37 @@ final class Learn {
                     A big <code>k</code> gives a tight hot core, a small one a wide haze.</p>
                     <p>Glow doesn't block the world behind it, so it needs an alpha. A simple one is the brightest color channel,
                     and dividing the color by that alpha keeps it from going dim when it's blended in.</p>
+                    <h2>Walking through a volume</h2>
+                    <p>With a surface you stop at the first hit. With glow there's nothing to hit, so the ray takes fixed steps through the
+                    whole box and adds a little light at each one. 90 steps of 0.04 cover 3.6 units, just enough to cross the box. Smaller
+                    steps give finer detail and cost more.</p>
+                    <h2>Shapes of glow</h2>
+                    <table>
+                    <tr><td><code>exp(-d * k)</code></td><td>smooth falloff, the usual choice</td></tr>
+                    <tr><td><code>1.0 / (1.0 + d * d * k)</code></td><td>a bright core with a long tail, like real light</td></tr>
+                    <tr><td>noise times either</td><td>broken up glow for plasma, smoke and fire</td></tr>
+                    </table>
+                    <h2>Glow that hides the background</h2>
+                    <p>Pure glow only adds. Real smoke also hides what's behind it. Keep a running <code>transmittance</code> that starts
+                    at 1 and shrinks with every step, <code>transmittance *= exp(-density * step)</code>, and multiply the light you add
+                    by it. That makes thick parts look solid and lets clouds and fire have a shape.</p>
+                    <h2>Scale by the step</h2>
+                    <p>Multiply what you add at each step by the step size. Then changing the step size changes the detail but not the
+                    brightness. Without it, halving the step doubles the glow.</p>
+                    <h2>Hiding the rings</h2>
+                    <p>Fixed steps leave rings where the samples line up. Start each ray at a slightly different spot, by adding a random
+                    fraction of a step to <code>t</code> from a hash of <code>gl_FragCoord.xy</code>, and the rings turn into fine grain
+                    that's much harder to see.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Too few steps make the glow look like stacked slices.</li>
+                    <li>Forgetting to tone map turns the core into a flat white blob.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Plasma: multiply the core's glow by a moving noise.</li>
+                    <li>Smoke: add transmittance and use a gray color.</li>
+                    </ul>
                     """, """
                     // glow and see-through
                     // this walks the ray in small steps through the box. right now nothing adds any light
@@ -535,6 +853,36 @@ final class Learn {
                     <p>Alpha cuts holes: return 0 and that pixel is gone, so a square panel can become a round portal.
                     The <code>#pragma vessel shape</code> line picks the item's shape: <code>cube</code>, <code>panel</code>,
                     <code>pillar</code> or <code>floor</code>.</p>
+                    <h2>uv or pos?</h2>
+                    <p><code>uv</code> starts over on every face, so a pattern drawn with it repeats the same way on all six sides.
+                    <code>pos</code> is the point's place in the item's box, which carries on across the corners. Use uv for screens,
+                    signs and anything that belongs on one face. Use pos for patterns that should wrap round the whole item without
+                    seams.</p>
+                    <h2>Drawing with distances</h2>
+                    <p>Flat shapes work just like the 3D ones in the object lessons, only in 2D:</p>
+                    <table>
+                    <tr><td>circle</td><td><code>length(uv - 0.5) - r</code></td></tr>
+                    <tr><td>ring</td><td><code>abs(length(uv - 0.5) - r) - thickness</code></td></tr>
+                    <tr><td>box</td><td><code>max(abs(uv.x - 0.5), abs(uv.y - 0.5)) - size</code></td></tr>
+                    </table>
+                    <p>Turn a distance into a shape with <code>smoothstep</code>: negative inside, positive outside.</p>
+                    <h2>Smooth edges</h2>
+                    <p><code>step</code> makes jagged pixel stairs. <code>fwidth(d)</code> tells you how much d changes from one pixel to
+                    the next, so <code>smoothstep(w, -w, d)</code> with <code>w = fwidth(d)</code> gives an edge exactly one pixel soft at
+                    any distance from the camera.</p>
+                    <h2>Fake depth</h2>
+                    <p>Look something up at <code>pos + view * depth</code> and it seems to sit behind the face. Stack a few at different
+                    depths and the item looks hollow, like a window into a room.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>A pattern flipped on some faces: that face's uv runs the other way, use pos for it instead.</li>
+                    <li>On panel and floor shapes the thin edges are skipped, so don't put anything important there.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>A screen with moving scanlines.</li>
+                    <li>A swirl for a portal using <code>atan(uv.y - 0.5, uv.x - 0.5)</code>, the angle around the middle.</li>
+                    </ul>
                     """, """
                     // your first surface
                     // uv goes 0 to 1 across each face of the item. right now it's shown as red and green so you can see it
@@ -567,6 +915,34 @@ final class Learn {
                     whichever pixel you're in, and everything you draw with it comes out blocky.</p>
                     <p>Without a png of your own the preview uses a plain gem. Put a png with the same name beside the effect
                     and it'll use that.</p>
+                    <h2>What runs through it</h2>
+                    <p>Only the pixels you can see on the item run through the material. See-through pixels around the sprite stay
+                    see-through as long as you pass <code>texel.a</code> along as the alpha. Return alpha 1 for everything and those
+                    empty pixels turn into solid squares.</p>
+                    <h2>Brightness that looks right</h2>
+                    <p>Eyes see green as much brighter than blue. For a brightness that matches what you see, weight the channels:
+                    <code>dot(texel.rgb, vec3(0.299, 0.587, 0.114))</code>. Use it to keep the sprite's shading, or as a mask.</p>
+                    <h2>Masks</h2>
+                    <p>A mask decides where the effect goes. <code>smoothstep(0.6, 0.8, brightness)</code> picks only the bright pixels,
+                    so a sword's blade can glow while its dark handle stays put. <code>uv.y</code> works as a mask too, for an effect
+                    that only covers the top of the item.</p>
+                    <h2>Staying blocky</h2>
+                    <p>Snapping to the 16 by 16 grid makes the effect move a whole pixel at a time, like vanilla textures do. You can snap
+                    time as well, <code>floor(time * 8.0) / 8.0</code>, for choppy animation in the style of the game's own animated
+                    blocks.</p>
+                    <h2>Depth as you turn</h2>
+                    <p>Offsetting uv by <code>view.xz * depth</code> moves a layer as the item turns. Several layers at different depths
+                    slide past each other and give the item depth, like the end portal.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Returning alpha 1 everywhere turns the transparent area into a solid square.</li>
+                    <li>Smooth, unsnapped effects look out of place next to blocky vanilla items.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Lava only on the bright parts, using a brightness mask.</li>
+                    <li>An enchantment style glint: a diagonal band sweeping across with time.</li>
+                    </ul>
                     """, """
                     // your first material
                     // texel is the item's own pixel color and uv goes 0 to 1 across the sprite.
@@ -593,12 +969,43 @@ final class Learn {
             new Lesson("lesson_overlay", "Your first overlay", "vignettes, pulses and the aspect trap", 10, """
                     <p>An overlay is laid over everything the player sees, like rain on the lens or the red edges you get at low
                     health. <code>screen</code> is where the pixel is on the window, 0,0 in the bottom left to 1,1 in the top right.</p>
-                    <p>Alpha matters more here than anywhere else: it's how much of the world you cover. 0 leaves the view clear,
+                    <p>Here alpha is how much of the world you cover. 0 leaves the view clear,
                     1 hides it completely. Keep the middle of the screen low or the player can't play.</p>
                     <p>One trap: <code>screen</code> is squashed into a square, but windows are wide, so a circle measured with it
                     comes out as an oval. Stretch x by about 1.8 before measuring and circles stay round.</p>
                     <p><code>dir</code> is the direction the pixel looks into the world. Things placed with <code>screen</code>
                     stick to your view, things placed with <code>dir</code> stay put when you turn your head.</p>
+                    <h2>Two ways to place things</h2>
+                    <p>Anything built from <code>screen</code> sticks to the glass, like rain on goggles, and moves with your head. Anything
+                    built from <code>dir</code> stays in the world: turn around and it's behind you. Mixing both is how a domain effect
+                    can tint your view and also have embers hanging in the air.</p>
+                    <h2>The aspect trap, exactly</h2>
+                    <p>A normal window is about 16 by 9, so screen x covers 1.78 times as much space as screen y. Multiplying x by about
+                    1.8 before measuring makes circles round on most screens. It's not exact on unusual monitors, but it's close enough
+                    for soft effects.</p>
+                    <h2>Keep it playable</h2>
+                    <ul>
+                    <li>Keep alpha under about 0.15 in the middle of the screen, where the player aims.</li>
+                    <li>Edges can go much higher, up to around 0.8, without getting in the way.</li>
+                    <li>Avoid flashing faster than three times a second. Fast flashing is uncomfortable and can be dangerous for people
+                    with photosensitive epilepsy.</li>
+                    </ul>
+                    <h2>Textures on the glass</h2>
+                    <p>Noise and cells from the sky lessons work on screen coordinates too: cells make raindrops, noise makes frost and
+                    grime. Scale <code>screen</code> up, around 10 to 30, for detail that matches the size of the window.</p>
+                    <h2>Fading in</h2>
+                    <p><code>clamp(time / 2.0, 0.0, 1.0)</code> grows from 0 to 1 over two seconds. Multiply your alpha by it so the
+                    overlay eases in instead of snapping on.</p>
+                    <h2>Common mistakes</h2>
+                    <ul>
+                    <li>Returning a color with alpha 1 everywhere covers the whole world.</li>
+                    <li>Forgetting the aspect fix stretches every circle into an oval.</li>
+                    </ul>
+                    <h2>Try this</h2>
+                    <ul>
+                    <li>Snow drifting past, placed with <code>dir</code> so it stays in the world.</li>
+                    <li>Raindrops on the glass, made from cells on <code>screen</code>.</li>
+                    </ul>
                     """, """
                     // your first overlay
                     // screen goes 0,0 bottom left to 1,1 top right. alpha is how much of the world you cover,
@@ -1011,7 +1418,25 @@ final class Learn {
                     """));
 
     static JEditorPane page(String html) {
-        JEditorPane pane = new JEditorPane();
+        JEditorPane pane = new JEditorPane() {
+            // in a plain column the pane measures itself as if nothing wrapped and cuts the rest off,
+            // so its height is worked out for the width it's actually given
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension d = super.getPreferredSize();
+                int w = getWidth() > 0 ? getWidth() : getParent() != null ? getParent().getWidth() : 0;
+                if (w <= 0) return d;
+                javax.swing.text.View root = getUI().getRootView(this);
+                root.setSize(w, Integer.MAX_VALUE);
+                java.awt.Insets in = getInsets();
+                return new Dimension(w, (int) Math.ceil(root.getPreferredSpan(javax.swing.text.View.Y_AXIS)) + in.top + in.bottom);
+            }
+
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
         HTMLEditorKit kit = new HTMLEditorKit();
         kit.getStyleSheet().addRule(css());
         pane.setEditorKit(kit);
@@ -1188,8 +1613,7 @@ final class Learn {
             body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
             body.setBorder(BorderFactory.createEmptyBorder(0, 14, 14, 14));
             JEditorPane theory = page(lesson.theory());
-            theory.setVisible(false);
-            JButton about = secondary("About this lesson");
+            JButton about = secondary("Hide the explanation");
             about.addActionListener(e -> {
                 theory.setVisible(!theory.isVisible());
                 about.setText(theory.isVisible() ? "Hide the explanation" : "About this lesson");
